@@ -1,6 +1,10 @@
 const canvas = document.getElementById('testCanvas');
 const ctx = canvas.getContext('2d');
 
+window.canvas = canvas;
+window.ctx = ctx;
+window.pieces = pieces;
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 

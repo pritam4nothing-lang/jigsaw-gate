@@ -77,7 +77,16 @@ trayMinX = Math.min(0, trayVisibleWidth - trayContentWidth);
 
 // right limit (always 0)
 trayMaxX = 0;
-   
+
+ // ===== PUZZLE IMAGE =====
+const puzzleImage = new Image();
+puzzleImage.src = 'assets/puzzle.jpg';
+let imageLoaded = false;
+
+puzzleImage.onload = () => {
+  imageLoaded = true;
+};
+  
 function trySnap(piece) {
   if (piece.locked) return false;
 
@@ -114,8 +123,15 @@ function trySnap(piece) {
 
 
 function draw() {
-  // optional: clear (background later theme দিয়ে আসবে)
+
+  // 🖼️ wait until image is loaded
+  if (!imageLoaded) {
+    requestAnimationFrame(draw);
+    return;
+  }
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 
   // ---- BOARD OUTLINE ----
   ctx.strokeStyle = '#888';

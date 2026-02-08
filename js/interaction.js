@@ -32,7 +32,7 @@ canvas.addEventListener('pointerdown', e => {
       )
     );
 
-    if (ctx.isPointInPath(hitPath, x, y)) {
+   if (ctx.isPointInPath(hitPath, x, y) && !p.locked) {
       activePiece = p;
       offsetX = x - (p.inTray ? p.x + trayOffsetX : p.x);
       offsetY = y - p.y;
@@ -51,27 +51,17 @@ canvas.addEventListener('pointerdown', e => {
 });
 
 
-window.addEventListener('pointermove', e => {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
+window.addEventListener('pointerup', e => {
+  isTrayScrolling = false;
 
-  // 👉 Tray scrolling
-  if (isTrayScrolling) {
-    const dx = x - lastPointerX;
-    trayOffsetX += dx;
+  if (activePiece) {
+    // Try snapping when released
+    trySnap(activePiece);
 
-    // clamp
-    trayOffsetX = Math.max(trayMinX, Math.min(trayOffsetX, trayMaxX));
-
-    lastPointerX = x;
-    return;
+    canvas.releasePointerCapture(e.pointerId);
   }
 
-  // 👉 Piece dragging
-  if (!activePiece) return;
-
-  activePiece.x = x - offsetX;
-  activePiece.y = e.clientY - rect.top - offsetY;
+  activePiece = null;
 });
 
 

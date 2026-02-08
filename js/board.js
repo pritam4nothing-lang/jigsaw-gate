@@ -7,8 +7,23 @@ window.ctx = ctx;
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const pieceSize = 100;
-const margin = 40;
+// ===== LAYOUT =====
+const PADDING = 16;
+const TITLE_HEIGHT = 60;
+const TRAY_HEIGHT_RATIO = 0.28;
+
+// Board sizing (mobile first)
+const boardWidth = Math.min(window.innerWidth * 0.9, 360);
+const pieceSize = boardWidth / CONFIG.cols;
+const boardHeight = pieceSize * CONFIG.rows;
+
+// Board position
+const boardX = (canvas.width - boardWidth) / 2;
+const boardY = TITLE_HEIGHT + PADDING;
+
+// Tray position
+const trayY = boardY + boardHeight + PADDING;
+const trayHeight = canvas.height - trayY - PADDING;
 
 const edgeMatrix = generateEdgeMatrix(CONFIG.rows, CONFIG.cols);
 const pieces = [];

@@ -160,29 +160,26 @@ pieces.forEach(p => {
   const drawX = p.inTray ? p.x + trayOffsetX : p.x;
   const drawY = p.y;
 
-  ctx.translate(drawX, drawY);
+ // ---- CLIP PIECE SHAPE ----
+ctx.save();
+ctx.translate(p.x, p.y);
+ctx.beginPath();
+ctx.clip(p.path);
 
-  // ---- CLIP TO JIGSAW SHAPE ----
-  ctx.save();
-  ctx.clip(p.path);
+// ---- DRAW IMAGE INSIDE PIECE ----
+ctx.drawImage(
+  puzzleImage,
+  imageOffsetX - p.correctX,
+  imageOffsetY - p.correctY,
+  imageDrawWidth,
+  imageDrawHeight
+);
 
-  // image crop source (from full image)
-  const sx = p.col * pieceSize;
-  const sy = p.row * pieceSize;
-  const sSize = pieceSize;
-
-  // draw cropped image into piece
-  ctx.drawImage(
-    puzzleImage,
-    sx,
-    sy,
-    sSize,
-    sSize,
-    0,
-    0,
-    pieceSize,
-    pieceSize
-  );
+// ---- STROKE OUTLINE ----
+ctx.restore();
+ctx.strokeStyle = '#b3005e';
+ctx.lineWidth = 2;
+ctx.stroke(p.path);
 
   ctx.restore();
 

@@ -46,3 +46,29 @@ function generateEdgeMatrix(rows, cols) {
 
   return matrix;
 }
+function createHorizontalEdgePath(path, x, y, size, type) {
+  const tabWidth = size * 0.3;
+  const tabHeight = size * 0.25 * type; // + for head, - for socket
+
+  const startX = x;
+  const endX = x + size;
+  const midX = x + size / 2;
+
+  // Straight line to start of tab
+  path.lineTo(midX - tabWidth / 2, y);
+
+  if (type !== 0) {
+    // Bézier curve for tab
+    path.bezierCurveTo(
+      midX - tabWidth / 2,
+      y - tabHeight,
+      midX + tabWidth / 2,
+      y - tabHeight,
+      midX + tabWidth / 2,
+      y
+    );
+  }
+
+  // Straight line to end
+  path.lineTo(endX, y);
+}

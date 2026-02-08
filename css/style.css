@@ -2,8 +2,13 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  touch-action: none; /* 🔥 THIS */
+  touch-action: none;
+  background: #fff;
+  font-family: serif;
 }
-canvas {
-  touch-action: none; /* 🔥 THIS */
+
+h1 {
+  text-align: center;
+  margin: 10px 0;
+  color: #b3005e;
 }

@@ -4,6 +4,7 @@ let offsetY = 0;
 
 // POINTER DOWN (on canvas)
 canvas.addEventListener('pointerdown', e => {
+  e.preventDefault(); // 🔥 IMPORTANT FOR MOBILE
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;

@@ -78,6 +78,23 @@ trayMinX = Math.min(0, trayVisibleWidth - trayContentWidth);
 // right limit (always 0)
 trayMaxX = 0;
    
+function trySnap(piece) {
+  if (piece.locked) return false;
+
+  const dx = piece.x - piece.correctX;
+  const dy = piece.y - piece.correctY;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance < CONFIG.snapRadius) {
+    piece.x = piece.correctX;
+    piece.y = piece.correctY;
+    piece.locked = true;
+    piece.inTray = false;
+    return true;
+  }
+  return false;
+}
+
 function draw() {
   // optional: clear (background later theme দিয়ে আসবে)
   ctx.clearRect(0, 0, canvas.width, canvas.height);

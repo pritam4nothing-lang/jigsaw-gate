@@ -158,6 +158,32 @@ pieces.forEach(p => {
   const drawY = p.y;
 
   ctx.translate(drawX, drawY);
+
+  // ---- CLIP TO JIGSAW SHAPE ----
+  ctx.save();
+  ctx.clip(p.path);
+
+  // image crop source (from full image)
+  const sx = p.col * pieceSize;
+  const sy = p.row * pieceSize;
+  const sSize = pieceSize;
+
+  // draw cropped image into piece
+  ctx.drawImage(
+    puzzleImage,
+    sx,
+    sy,
+    sSize,
+    sSize,
+    0,
+    0,
+    pieceSize,
+    pieceSize
+  );
+
+  ctx.restore();
+
+  // ---- BORDER ON TOP ----
   ctx.stroke(p.path);
 
   ctx.restore();

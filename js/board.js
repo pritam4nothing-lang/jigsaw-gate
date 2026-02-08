@@ -100,12 +100,18 @@ function draw() {
   ctx.strokeStyle = '#b3005e'; // deep pink
   ctx.lineWidth = 2;
 
-  pieces.forEach(p => {
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    ctx.stroke(p.path);
-    ctx.restore();
-  });
+pieces.forEach(p => {
+  ctx.save();
+
+  const drawX = p.inTray ? p.x + trayOffsetX : p.x;
+  const drawY = p.y;
+
+  ctx.translate(drawX, drawY);
+  ctx.stroke(p.path);
+
+  ctx.restore();
+});
+
 
   requestAnimationFrame(draw);
 }

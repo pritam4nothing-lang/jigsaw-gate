@@ -11,17 +11,10 @@ canvas.addEventListener('pointerdown', e => {
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
 
-  // 👉 If touch is inside tray → start scrolling
-  if (y >= trayY && y <= trayY + trayHeight) {
-    isTrayScrolling = true;
-    lastPointerX = x;
-    canvas.setPointerCapture(e.pointerId);
-    return;
-  }
-
-  // 👉 Otherwise try picking a piece
+  // 1️⃣ FIRST: try picking a piece (even inside tray)
   for (let i = pieces.length - 1; i >= 0; i--) {
     const p = pieces[i];
+    if (p.locked) continue;
 
     const hitPath = new Path2D();
     hitPath.addPath(
@@ -32,36 +25,47 @@ canvas.addEventListener('pointerdown', e => {
       )
     );
 
-   if (ctx.isPointInPath(hitPath, x, y) && !p.locked) {
+    if (ctx.isPointInPath(hitPath, x, y)) {
       activePiece = p;
       offsetX = x - (p.inTray ? p.x + trayOffsetX : p.x);
       offsetY = y - p.y;
 
-      // lifted from tray
       p.inTray = false;
 
-      // bring to top
       pieces.splice(i, 1);
       pieces.push(p);
 
       canvas.setPointerCapture(e.pointerId);
-      break;
+      return;
     }
+  }
+
+  // 2️⃣ IF no piece touched AND inside tray → scroll tray
+  if (y >= trayY && y <= trayY + trayHeight) {
+    isTrayScrolling = true;
+    lastPointerX = x;
+    canvas.setPointerCapture(e.pointerId);
   }
 });
 
 
-window.addEventListener('pointerup', e => {
-  isTrayScrolling = false;
+window.addEventListener('pointermove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
 
-  if (activePiece) {
-    // 🧲 TRY SNAP ON RELEASE
-    trySnap(activePiece);
+  if (isTrayScrolling) {
+    const dx = x - lastPointerX;
+    trayOffsetX += dx;
 
-    canvas.releasePointerCapture(e.pointerId);
+    trayOffsetX = Math.max(trayMinX, Math.min(trayOffsetX, trayMaxX));
+    lastPointerX = x;
+    return;
   }
 
-  activePiece = null;
+  if (!activePiece) return;
+
+  activePiece.x = x - offsetX;
+  activePiece.y = e.clientY - rect.top - offsetY;
 });
 
 

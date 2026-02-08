@@ -1,22 +1,28 @@
 const canvas = document.getElementById('testCanvas');
 const ctx = canvas.getContext('2d');
 
-window.canvas = canvas;
-window.ctx = ctx;
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-// ===== LAYOUT =====
+const puzzleImage = new Image();
+puzzleImage.src = 'assets/puzzle.jpg';
+
+let imageReady = false;
+puzzleImage.onload = () => imageReady = true;
+
 const PADDING = 16;
 const TITLE_HEIGHT = 60;
-const TRAY_HEIGHT_RATIO = 0.28;
-// ===== TRAY SCROLL STATE =====
-let trayOffsetX = 0;
-let trayMinX = 0;
-let trayMaxX = 0;
 
-// ===== IMAGE SCALE & OFFSET (9.4.1-F) =====
+const boardWidth = Math.min(canvas.width * 0.9, 360);
+const pieceSize = boardWidth / CONFIG.cols;
+const boardHeight = pieceSize * CONFIG.rows;
+
+const boardX = (canvas.width - boardWidth) / 2;
+const boardY = TITLE_HEIGHT + PADDING;
+
+const trayY = boardY + boardHeight + PADDING;
+const trayHeight = canvas.height - trayY - PADDING;
+
 const imageScale = Math.max(
   boardWidth / puzzleImage.width,
   boardHeight / puzzleImage.height
@@ -28,167 +34,84 @@ const imageDrawHeight = puzzleImage.height * imageScale;
 const imageOffsetX = boardX - (imageDrawWidth - boardWidth) / 2;
 const imageOffsetY = boardY - (imageDrawHeight - boardHeight) / 2;
 
-// Tray position
-const trayY = boardY + boardHeight + PADDING;
-const trayHeight = canvas.height - trayY - PADDING;
-
 const edgeMatrix = generateEdgeMatrix(CONFIG.rows, CONFIG.cols);
 const pieces = [];
+window.pieces = pieces;
 
-window.pieces = pieces; // ✅ AFTER declaration
-
-
+let trayOffsetX = 0;
 let trayCursorX = PADDING;
 
 for (let r = 0; r < CONFIG.rows; r++) {
   for (let c = 0; c < CONFIG.cols; c++) {
-
-    const correctX = boardX + c * pieceSize;
-    const correctY = boardY + r * pieceSize;
-
     pieces.push({
       row: r,
       col: c,
-      edges: edgeMatrix[r][c],
-
-      // START IN TRAY
+      correctX: boardX + c * pieceSize,
+      correctY: boardY + r * pieceSize,
       x: trayCursorX,
       y: trayY + (trayHeight - pieceSize) / 2,
-
-      correctX,
-      correctY,
-
       inTray: true,
       locked: false,
-
       path: createPiecePath(0, 0, pieceSize, edgeMatrix[r][c])
     });
 
-    trayCursorX += pieceSize + 12; // horizontal spacing
+    trayCursorX += pieceSize + 12;
   }
 }
 
-// ===== TRAY SCROLL LIMITS =====
-const trayContentWidth =
-  pieces.length * (pieceSize + 12);
+const trayContentWidth = trayCursorX;
+const trayMinX = Math.min(0, canvas.width - trayContentWidth - PADDING);
+const trayMaxX = 0;
 
-const trayVisibleWidth =
-  canvas.width - PADDING * 2;
+function trySnap(p) {
+  if (p.locked) return;
 
-// left limit (negative value)
-trayMinX = Math.min(0, trayVisibleWidth - trayContentWidth);
+  const dx = p.x - p.correctX;
+  const dy = p.y - p.correctY;
 
-// right limit (always 0)
-trayMaxX = 0;
-
- // ===== PUZZLE IMAGE =====
-const puzzleImage = new Image();
-puzzleImage.src = 'assets/puzzle.jpg';
-let imageLoaded = false;
-
-puzzleImage.onload = () => {
-  imageLoaded = true;
-};
-  
-function trySnap(piece) {
-  if (piece.locked) return false;
-
-  const dx = piece.x - piece.correctX;
-  const dy = piece.y - piece.correctY;
-  const distance = Math.sqrt(dx * dx + dy * dy);
-
-  // 🔍 DEBUG LOG (TEMPORARY)
-  console.log('SNAP CHECK →', {
-    pieceRow: piece.row,
-    pieceCol: piece.col,
-    x: piece.x,
-    y: piece.y,
-    correctX: piece.correctX,
-    correctY: piece.correctY,
-    dx,
-    dy,
-    distance,
-    snapRadius: CONFIG.snapRadius
-  });
-
-  if (distance < CONFIG.snapRadius) {
-    piece.x = piece.correctX;
-    piece.y = piece.correctY;
-    piece.locked = true;
-    piece.inTray = false;
-
-    console.log('✅ SNAPPED');
-    return true;
+  if (Math.hypot(dx, dy) < CONFIG.snapRadius) {
+    p.x = p.correctX;
+    p.y = p.correctY;
+    p.locked = true;
+    p.inTray = false;
   }
-
-  return false;
 }
-
 
 function draw() {
-
-  // 🖼️ wait until image is loaded
-  if (!imageLoaded) {
+  if (!imageReady) {
     requestAnimationFrame(draw);
     return;
   }
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-
-  // ---- BOARD OUTLINE ----
-  ctx.strokeStyle = '#888';
-  ctx.lineWidth = 2;
+  // board
+  ctx.strokeStyle = '#aaa';
   ctx.strokeRect(boardX, boardY, boardWidth, boardHeight);
 
-  // ---- TRAY OUTLINE ----
-  ctx.strokeStyle = '#bbb';
-  ctx.strokeRect(
-    PADDING,
-    trayY,
-    canvas.width - PADDING * 2,
-    trayHeight
-  );
+  // tray
+  ctx.strokeRect(PADDING, trayY, canvas.width - PADDING * 2, trayHeight);
 
-  // ---- DRAW PIECES ----
-  ctx.strokeStyle = '#b3005e'; // deep pink
-  ctx.lineWidth = 2;
+  pieces.forEach(p => {
+    ctx.save();
+    ctx.translate(p.x + (p.inTray ? trayOffsetX : 0), p.y);
 
-pieces.forEach(p => {
-  ctx.save();
+    ctx.clip(p.path);
 
-  const drawX = p.inTray ? p.x + trayOffsetX : p.x;
-  const drawY = p.y;
+    ctx.drawImage(
+      puzzleImage,
+      imageOffsetX - p.correctX,
+      imageOffsetY - p.correctY,
+      imageDrawWidth,
+      imageDrawHeight
+    );
 
- // ---- CLIP PIECE SHAPE ----
-ctx.save();
-ctx.translate(p.x, p.y);
-ctx.beginPath();
-ctx.clip(p.path);
+    ctx.restore();
 
-// ---- DRAW IMAGE INSIDE PIECE ----
-ctx.drawImage(
-  puzzleImage,
-  imageOffsetX - p.correctX,
-  imageOffsetY - p.correctY,
-  imageDrawWidth,
-  imageDrawHeight
-);
-
-// ---- STROKE OUTLINE ----
-ctx.restore();
-ctx.strokeStyle = '#b3005e';
-ctx.lineWidth = 2;
-ctx.stroke(p.path);
-
-  ctx.restore();
-
-  // ---- BORDER ON TOP ----
-  ctx.stroke(p.path);
-
-  ctx.restore();
-});
-
+    ctx.strokeStyle = '#b3005e';
+    ctx.lineWidth = 2;
+    ctx.stroke(p.path);
+  });
 
   requestAnimationFrame(draw);
 }

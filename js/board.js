@@ -11,6 +11,10 @@ canvas.height = window.innerHeight;
 const PADDING = 16;
 const TITLE_HEIGHT = 60;
 const TRAY_HEIGHT_RATIO = 0.28;
+// ===== TRAY SCROLL STATE =====
+let trayOffsetX = 0;
+let trayMinX = 0;
+let trayMaxX = 0;
 
 // Board sizing (mobile first)
 const boardWidth = Math.min(window.innerWidth * 0.9, 360);
@@ -61,6 +65,18 @@ for (let r = 0; r < CONFIG.rows; r++) {
   }
 }
 
+// ===== TRAY SCROLL LIMITS =====
+const trayContentWidth =
+  pieces.length * (pieceSize + 12);
+
+const trayVisibleWidth =
+  canvas.width - PADDING * 2;
+
+// left limit (negative value)
+trayMinX = Math.min(0, trayVisibleWidth - trayContentWidth);
+
+// right limit (always 0)
+trayMaxX = 0;
    
 function draw() {
   // optional: clear (background later theme দিয়ে আসবে)

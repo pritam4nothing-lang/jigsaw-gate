@@ -24,13 +24,30 @@ canvas.addEventListener('pointerdown', e => {
   }
 });
 
-canvas.addEventListener('pointermove', e => {
-  if (!activePiece) return;
+canvas.addEventListener('pointerdown', e => {
   const rect = canvas.getBoundingClientRect();
-  activePiece.x = e.clientX - rect.left - offsetX;
-  activePiece.y = e.clientY - rect.top - offsetY;
-});
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
 
-canvas.addEventListener('pointerup', () => {
-  activePiece = null;
+  for (let i = pieces.length - 1; i >= 0; i--) {
+    const p = pieces[i];
+
+    ctx.save();
+    ctx.translate(p.x, p.y);
+
+    // ✅ CORRECT hit test (local coords)
+    if (ctx.isPointInPath(p.path, x - p.x, y - p.y)) {
+      activePiece = p;
+      offsetX = x - p.x;
+      offsetY = y - p.y;
+
+      pieces.splice(i, 1);
+      pieces.push(p); // bring to top
+
+      ctx.restore();
+      break;
+    }
+
+    ctx.restore();
+  }
 });

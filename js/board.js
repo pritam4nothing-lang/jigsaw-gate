@@ -85,15 +85,33 @@ function trySnap(piece) {
   const dy = piece.y - piece.correctY;
   const distance = Math.sqrt(dx * dx + dy * dy);
 
+  // 🔍 DEBUG LOG (TEMPORARY)
+  console.log('SNAP CHECK →', {
+    pieceRow: piece.row,
+    pieceCol: piece.col,
+    x: piece.x,
+    y: piece.y,
+    correctX: piece.correctX,
+    correctY: piece.correctY,
+    dx,
+    dy,
+    distance,
+    snapRadius: CONFIG.snapRadius
+  });
+
   if (distance < CONFIG.snapRadius) {
     piece.x = piece.correctX;
     piece.y = piece.correctY;
     piece.locked = true;
     piece.inTray = false;
+
+    console.log('✅ SNAPPED');
     return true;
   }
+
   return false;
 }
+
 
 function draw() {
   // optional: clear (background later theme দিয়ে আসবে)

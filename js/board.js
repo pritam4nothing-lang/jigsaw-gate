@@ -31,14 +31,35 @@ const pieces = [];
 window.pieces = pieces; // ✅ AFTER declaration
 
 
+let trayCursorX = PADDING;
+
 for (let r = 0; r < CONFIG.rows; r++) {
   for (let c = 0; c < CONFIG.cols; c++) {
 
-    const correctX = margin + c * (pieceSize + 2);
-    const correctY = margin + r * (pieceSize + 2);
+    const correctX = boardX + c * pieceSize;
+    const correctY = boardY + r * pieceSize;
 
-    const randomX = Math.random() * (canvas.width - pieceSize);
-    const randomY = Math.random() * (canvas.height - pieceSize);
+    pieces.push({
+      row: r,
+      col: c,
+      edges: edgeMatrix[r][c],
+
+      // START IN TRAY
+      x: trayCursorX,
+      y: trayY + (trayHeight - pieceSize) / 2,
+
+      correctX,
+      correctY,
+
+      inTray: true,
+      locked: false,
+
+      path: createPiecePath(0, 0, pieceSize, edgeMatrix[r][c])
+    });
+
+    trayCursorX += pieceSize + 12; // horizontal spacing
+  }
+}
 
     pieces.push({
       row: r,
@@ -53,9 +74,25 @@ for (let r = 0; r < CONFIG.rows; r++) {
   }
 }
 function draw() {
+  // optional: clear (background later theme দিয়ে আসবে)
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = '#b3005e'; // deep pink / romantic
+  // ---- BOARD OUTLINE ----
+  ctx.strokeStyle = '#888';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(boardX, boardY, boardWidth, boardHeight);
+
+  // ---- TRAY OUTLINE ----
+  ctx.strokeStyle = '#bbb';
+  ctx.strokeRect(
+    PADDING,
+    trayY,
+    canvas.width - PADDING * 2,
+    trayHeight
+  );
+
+  // ---- DRAW PIECES ----
+  ctx.strokeStyle = '#b3005e'; // deep pink
   ctx.lineWidth = 2;
 
   pieces.forEach(p => {

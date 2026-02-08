@@ -55,7 +55,7 @@ window.addEventListener('pointerup', e => {
   isTrayScrolling = false;
 
   if (activePiece) {
-    // Try snapping when released
+    // 🧲 TRY SNAP ON RELEASE
     trySnap(activePiece);
 
     canvas.releasePointerCapture(e.pointerId);

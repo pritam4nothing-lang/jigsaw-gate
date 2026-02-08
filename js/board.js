@@ -16,14 +16,17 @@ let trayOffsetX = 0;
 let trayMinX = 0;
 let trayMaxX = 0;
 
-// Board sizing (mobile first)
-const boardWidth = Math.min(window.innerWidth * 0.9, 360);
-const pieceSize = boardWidth / CONFIG.cols;
-const boardHeight = pieceSize * CONFIG.rows;
+// ===== IMAGE SCALE & OFFSET (9.4.1-F) =====
+const imageScale = Math.max(
+  boardWidth / puzzleImage.width,
+  boardHeight / puzzleImage.height
+);
 
-// Board position
-const boardX = (canvas.width - boardWidth) / 2;
-const boardY = TITLE_HEIGHT + PADDING;
+const imageDrawWidth = puzzleImage.width * imageScale;
+const imageDrawHeight = puzzleImage.height * imageScale;
+
+const imageOffsetX = boardX - (imageDrawWidth - boardWidth) / 2;
+const imageOffsetY = boardY - (imageDrawHeight - boardHeight) / 2;
 
 // Tray position
 const trayY = boardY + boardHeight + PADDING;

@@ -4,4 +4,5 @@ const CONFIG = {
   snapTolerance: 18,
   imageSrc: 'assets/puzzle.jpg'
 };
+CONFIG.snapRadius = 24; // mobile-friendly snap distance (px)
 

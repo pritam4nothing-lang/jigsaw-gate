@@ -74,6 +74,9 @@ window.addEventListener('pointerup', e => {
   isTrayScrolling = false;
 
   if (activePiece) {
+    // 🧲 SNAP CHECK HERE
+    trySnap(activePiece);
+
     canvas.releasePointerCapture(e.pointerId);
   }
 

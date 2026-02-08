@@ -72,3 +72,28 @@ function createHorizontalEdgePath(path, x, y, size, type) {
   // Straight line to end
   path.lineTo(endX, y);
 }
+function createVerticalEdgePath(path, x, y, size, type) {
+  const tabWidth = size * 0.3;
+  const tabHeight = size * 0.25 * type;
+
+  const startY = y;
+  const endY = y + size;
+  const midY = y + size / 2;
+
+  // Straight line to start of tab
+  path.lineTo(x, midY - tabWidth / 2);
+
+  if (type !== 0) {
+    path.bezierCurveTo(
+      x - tabHeight,
+      midY - tabWidth / 2,
+      x - tabHeight,
+      midY + tabWidth / 2,
+      x,
+      midY + tabWidth / 2
+    );
+  }
+
+  // Straight line to end
+  path.lineTo(x, endY);
+}

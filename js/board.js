@@ -61,18 +61,7 @@ for (let r = 0; r < CONFIG.rows; r++) {
   }
 }
 
-    pieces.push({
-      row: r,
-      col: c,
-      edges: edgeMatrix[r][c],
-      x: randomX,
-      y: randomY,
-      correctX,
-      correctY,
-      path: createPiecePath(0, 0, pieceSize, edgeMatrix[r][c])
-    });
-  }
-}
+   
 function draw() {
   // optional: clear (background later theme দিয়ে আসবে)
   ctx.clearRect(0, 0, canvas.width, canvas.height);

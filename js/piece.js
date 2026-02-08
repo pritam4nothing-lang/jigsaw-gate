@@ -1,18 +1,22 @@
 function createPiecePath(x, y, size, edges) {
   const path = new Path2D();
 
+  // Start point
   path.moveTo(x, y);
 
-  // Top
+  // TOP
   createHorizontalEdgePath(path, x, y, size, edges.top);
 
-  // Right
+  // RIGHT
+  path.lineTo(x + size, y);
   createVerticalEdgePath(path, x + size, y, size, edges.right);
 
-  // Bottom (reverse direction)
+  // BOTTOM
+  path.lineTo(x + size, y + size);
   createHorizontalEdgePath(path, x, y + size, size, -edges.bottom);
 
-  // Left (reverse direction)
+  // LEFT
+  path.lineTo(x, y + size);
   createVerticalEdgePath(path, x, y, size, -edges.left);
 
   path.closePath();

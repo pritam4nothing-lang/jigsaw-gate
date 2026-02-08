@@ -3,7 +3,6 @@ const ctx = canvas.getContext('2d');
 
 window.canvas = canvas;
 window.ctx = ctx;
-window.pieces = pieces;
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -13,6 +12,9 @@ const margin = 40;
 
 const edgeMatrix = generateEdgeMatrix(CONFIG.rows, CONFIG.cols);
 const pieces = [];
+
+window.pieces = pieces; // ✅ AFTER declaration
+
 
 for (let r = 0; r < CONFIG.rows; r++) {
   for (let c = 0; c < CONFIG.cols; c++) {

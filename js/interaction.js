@@ -9,45 +9,21 @@ canvas.addEventListener('pointerdown', e => {
 
   for (let i = pieces.length - 1; i >= 0; i--) {
     const p = pieces[i];
-    ctx.save();
-    ctx.translate(p.x, p.y);
-    if (ctx.isPointInPath(p.path, x - p.x, y - p.y)) {
-      activePiece = p;
-      offsetX = x - p.x;
-      offsetY = y - p.y;
-      pieces.splice(i, 1);
-      pieces.push(p); // bring to top
-      ctx.restore();
-      break;
-    }
-    ctx.restore();
-  }
-});
 
-canvas.addEventListener('pointerdown', e => {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+    // ❌ NO ctx.translate here
 
-  for (let i = pieces.length - 1; i >= 0; i--) {
-    const p = pieces[i];
+    // ✅ create transformed path for hit-test
+    const hitPath = new Path2D();
+    hitPath.addPath(p.path, new DOMMatrix().translate(p.x, p.y));
 
-    ctx.save();
-    ctx.translate(p.x, p.y);
-
-    // ✅ CORRECT hit test (local coords)
-    if (ctx.isPointInPath(p.path, x - p.x, y - p.y)) {
+    if (ctx.isPointInPath(hitPath, x, y)) {
       activePiece = p;
       offsetX = x - p.x;
       offsetY = y - p.y;
 
       pieces.splice(i, 1);
       pieces.push(p); // bring to top
-
-      ctx.restore();
       break;
     }
-
-    ctx.restore();
   }
 });

@@ -40,7 +40,7 @@ for (let r = 0; r < CONFIG.rows; r++) {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  ctx.strokeStyle = 'white';
+  ctx.strokeStyle = '#b3005e'; // deep pink / romantic
   ctx.lineWidth = 2;
 
   pieces.forEach(p => {
